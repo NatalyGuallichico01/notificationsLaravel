@@ -3,6 +3,7 @@
 This is a starter template page. Use this page to start your new project from
 scratch. This page gets rid of all links and provides the needed markup only.
 -->
+
 <html lang="en">
 
 <head>
@@ -10,7 +11,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
 
-  <title>AdminLTE 3 | Starter</title>
+  <title>notificaciones</title>
   
   <!-- CSRF Token -->
   <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -31,16 +32,48 @@ scratch. This page gets rid of all links and provides the needed markup only.
       </ul>
 
       <!-- SEARCH FORM -->
-      <form class="form-inline ml-3">
-        <div class="input-group input-group-sm">
-          <input class="form-control form-control-navbar" type="search" placeholder="Search" aria-label="Search">
-          <div class="input-group-append">
-            <button class="btn btn-navbar" type="submit">
-              <i class="fas fa-search"></i>
-            </button>
-          </div>
+     
+      <!-- Right navbar links -->
+    <ul class="navbar-nav ml-auto">
+       <!-- Notifications Dropdown Menu -->
+       <li class="nav-item dropdown">
+        <a class="nav-link" data-toggle="dropdown" href="#">
+          <i class="fas fa-bell"></i>
+          
+            @if (count(auth()->user()->unreadNotifications))
+                <span class="badge badge-warning">{{count(auth()->user()->unreadNotifications)}}</span>
+            @endif
+          
+        </a>
+        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+          <span class="dropdown-header">Notificaciones no leídas</span>
+          @forelse (auth()->user()->unreadNotifications as $notification)
+          <a href="#" class="dropdown-item">
+            <i class="fas fa-envelope mr-2"></i> {{$notification->data['title']}}
+            <span class="ml-3 pull-right text-muted text-sm">{{$notification->created_at->diffForHumans()}}</span>
+            
+          </a>
+          @empty
+          <span class="ml-3 pull-right text-muted text-sm">Sin notificaciones por leer</span>
+          @endforelse
+          
+          <div class="dropdown-divider"></div>
+          <span class="dropdown-header">Notificaciones leídas</span>
+          @forelse (auth()->user()->readNotifications as $notification)
+          <a href="#" class="dropdown-item">
+            <i class="fas fa-users mr-2"></i> {{$notification->data['description']}}
+            <span class="ml-3 pull-right text-muted text-sm">{{$notification->created_at->diffForHumans()}}</span>
+          </a>
+          @empty
+          <span class="ml-3 pull-right text-muted text-sm">Sin notificaciones leidas</span>
+          @endforelse
+          
+          
+          <div class="dropdown-divider"></div>
+          <a href="{{route('markAsRead')}}" class="dropdown-item dropdown-footer">Marcar todas como leídas</a>
         </div>
-      </form>
+      </li>
+    </ul>
     </nav>
     <!-- /.navbar -->
 
@@ -50,7 +83,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
       <a href="index3.html" class="brand-link">
         <img src="../img/logo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3"
           style="opacity: .8">
-        <span class="brand-text font-weight-light">AdminLTE 3</span>
+        <span class="brand-text font-weight-light">Notificaciones</span>
       </a>
 
       <!-- Sidebar -->
@@ -74,7 +107,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
               <a href="#" class="nav-link active">
                 <i class="nav-icon fas fa-tachometer-alt"></i>
                 <p>
-                  Starter Pages
+                  Inicio
                   <i class="right fas fa-angle-left"></i>
                 </p>
               </a>
@@ -93,15 +126,39 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 </li>
               </ul>
             </li>
+           
+
             <li class="nav-item">
-              <a href="#" class="nav-link">
-                <i class="nav-icon fas fa-th"></i>
+              <a href="{{route('post.create')}}" class="nav-link">
+                <i class="nav-icon fas fa-users"></i>
                 <p>
-                  Simple Link
-                  <span class="right badge badge-danger">New</span>
+                  Crear Post
                 </p>
               </a>
             </li>
+            <li class="nav-item">
+              <a href="{{route('post.index')}}" class="nav-link">
+                <i class="nav-icon fas fa-users"></i>
+                <p>
+                  Notificaciones
+                </p>
+              </a>
+            </li>
+
+            <li class="nav-item">
+             <a class="nav-link" href="{{ route('logout') }}"
+                  onclick="event.preventDefault();
+                      document.getElementById('logout-form').submit();">
+                      <i class="nav-icon fas fa-blog"></i>
+                      Salir
+                  </a>
+
+                  <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                      @csrf
+                  </form>
+             
+          </li>
+
           </ul>
         </nav>
         <!-- /.sidebar-menu -->
@@ -116,14 +173,9 @@ scratch. This page gets rid of all links and provides the needed markup only.
         <div class="container-fluid">
           <div class="row mb-2">
             <div class="col-sm-6">
-              <h1 class="m-0 text-dark">Starter Page</h1>
+              <h1 class="m-0 text-dark">Inicio</h1>
             </div><!-- /.col -->
-            <div class="col-sm-6">
-              <ol class="breadcrumb float-sm-right">
-                <li class="breadcrumb-item"><a href="#">Home</a></li>
-                <li class="breadcrumb-item active">Starter Page</li>
-              </ol>
-            </div><!-- /.col -->
+           
           </div><!-- /.row -->
         </div><!-- /.container-fluid -->
       </div>
@@ -133,60 +185,28 @@ scratch. This page gets rid of all links and provides the needed markup only.
       <div class="content">
         <div class="container-fluid">
           <div class="row">
-            <div class="col-lg-6">
+            <div class="col-lg-12">
               <div class="card">
                 <div class="card-body">
-                  <h5 class="card-title">Card title</h5>
-
-                  <p class="card-text">
-                    Some quick example text to build on the card title and make up the bulk of the card's
-                    content.
-                  </p>
-
-                  <a href="#" class="card-link">Card link</a>
-                  <a href="#" class="card-link">Another link</a>
+                  <div class="container-fluid">
+                    @if (session('message'))
+                        <div class="row mb-2">
+                          <div class="col-lg-12">
+                          <div class="alert alert-warning">
+                            {{session('message')}}
+                          </div>
+                          </div>
+                        </div>
+                    @endif
+                  </div>
+                  @yield('content')
                 </div>
               </div>
 
-              <div class="card card-primary card-outline">
-                <div class="card-body">
-                  <h5 class="card-title">Card title</h5>
-
-                  <p class="card-text">
-                    Some quick example text to build on the card title and make up the bulk of the card's
-                    content.
-                  </p>
-                  <a href="#" class="card-link">Card link</a>
-                  <a href="#" class="card-link">Another link</a>
-                </div>
-              </div><!-- /.card -->
+             
             </div>
             <!-- /.col-md-6 -->
-            <div class="col-lg-6">
-              <div class="card">
-                <div class="card-header">
-                  <h5 class="m-0">Featured</h5>
-                </div>
-                <div class="card-body">
-                  <h6 class="card-title">Special title treatment</h6>
-
-                  <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-                  <a href="#" class="btn btn-primary">Go somewhere</a>
-                </div>
-              </div>
-
-              <div class="card card-primary card-outline">
-                <div class="card-header">
-                  <h5 class="m-0">Featured</h5>
-                </div>
-                <div class="card-body">
-                  <h6 class="card-title">Special title treatment</h6>
-
-                  <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-                  <a href="#" class="btn btn-primary">Go somewhere</a>
-                </div>
-              </div>
-            </div>
+          
             <!-- /.col-md-6 -->
           </div>
           <!-- /.row -->
